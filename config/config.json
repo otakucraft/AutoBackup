@@ -1,0 +1,10 @@
+[
+    {
+        "name": "test",
+        "ssh_remote_path": "1.2.3.4:/home/test/bck/",
+        "ssh_user": "user",
+        "ssh_pass": "pass",
+        "local_path": "/home/bck/",
+        "n_backups": 5
+    }
+]
