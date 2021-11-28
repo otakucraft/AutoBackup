@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-var _SERVERS []Server
+var Servers []Server
 
 type Server struct {
 	Name 		  string `json:"name"`  // Unique name ID.
@@ -14,7 +14,7 @@ type Server struct {
 	SSHUser       string `json:"ssh_user"`  // SSH user.
 	SSHPass       string `json:"ssh_pass"`  // SSH pass.
 	LocalPath	  string `json:"local_path"`  // Path where we want the copy to be stored.
-	NBackups      uint   `json:"n_backups"`  // Number of maximum backups that can be stored.
+	NBackups      int    `json:"n_backups"`  // Number of maximum backups that can be stored.
 }
 
 func ReadConfig(path string) error {
@@ -29,13 +29,13 @@ func ReadConfig(path string) error {
 		return err
 	}
 
-	_SERVERS = servers
+	Servers = servers
 
 	return nil
 }
 
 func GetServer(name string) (Server, error) {
-	for _, server := range _SERVERS {
+	for _, server := range Servers {
 		if server.Name == name {
 			return server, nil
 		}
@@ -44,7 +44,7 @@ func GetServer(name string) (Server, error) {
 }
 
 func CreateSample(path string) {
-	_SERVERS = []Server{
+	Servers = []Server{
 		{
 			Name:          "test",
 			SSHRemotePath: "1.2.3.4:/home/test/bck/",
@@ -54,7 +54,7 @@ func CreateSample(path string) {
 			NBackups:      5,
 		},
 	}
-	jsonString, err := json.MarshalIndent(_SERVERS, "", "    ")
+	jsonString, err := json.MarshalIndent(Servers, "", "    ")
 	if err != nil {
 		return
 	}
