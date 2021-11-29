@@ -9,9 +9,8 @@ import (
 	"net/http"
 )
 
-func StartRouter() {
-	port := "8462"
-	log.Println("Starting a server on http://127.0.0.1:" + port)
+func StartRouter(port *string) {
+	log.Println("Starting a server on http://127.0.0.1:" + *port)
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -45,5 +44,5 @@ func StartRouter() {
 	router.HandleFunc("/reload", endpoints.ReloadConfigFile).Methods("GET")
 	router.HandleFunc("/create/{name}", endpoints.CreateBackup).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":" + port, router))
+	log.Fatal(http.ListenAndServe(":" + *port, router))
 }

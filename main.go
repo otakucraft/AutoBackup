@@ -5,9 +5,13 @@ import (
 	"backup/routes"
 	"backup/rsync"
 	"backup/utils"
+	"flag"
 )
 
 func main() {
+	var port = flag.String("p", "8462", "Service port")
+	flag.Parse()
+
 	if !utils.DirExists("config") {
 		if !utils.TouchDir("config") {
 			return
@@ -28,5 +32,5 @@ func main() {
 	rsync.RsyncExecutor = rsync.NewExecutor()
 	rsync.RsyncExecutor.Start()
 
-	routes.StartRouter()
+	routes.StartRouter(port)
 }
