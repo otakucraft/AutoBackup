@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-func ReloadConfigFile(writer http.ResponseWriter, request *http.Request) {
+// ReloadConfigFile /reload endpoint, re-reads the config file and applies new changes to the cfg.Server array.
+func ReloadConfigFile(writer http.ResponseWriter, _ *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	err := cfg.ReadConfig("config/config.json")
 	var res utils.Result

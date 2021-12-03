@@ -9,10 +9,12 @@ import (
 	"net/http"
 )
 
+// StartRouter starts the main router with a port given by arg in the main class [ ./bin -p 5689 ].
 func StartRouter(port *string) {
 	log.Println("Starting a server on http://127.0.0.1:" + *port)
 	router := mux.NewRouter().StrictSlash(true)
 
+	// 404 handler.
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
@@ -25,6 +27,7 @@ func StartRouter(port *string) {
 		}
 	})
 
+	// 403 handler.
 	router.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -37,12 +40,15 @@ func StartRouter(port *string) {
 		}
 	})
 
+	// Kubernetes health check.
 	router.HandleFunc("/healthcheck", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 	}).Methods("GET")
 
+	// Custom endpoints.
 	router.HandleFunc("/reload", endpoints.ReloadConfigFile).Methods("GET")
 	router.HandleFunc("/create/{name}", endpoints.CreateBackup).Methods("GET")
 
+	// Start the router.
 	log.Fatal(http.ListenAndServe(":" + *port, router))
 }

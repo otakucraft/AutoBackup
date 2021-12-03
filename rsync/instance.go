@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// Status enum to know the instance status.
 type Status int
 
 const (
@@ -21,6 +22,7 @@ const (
 	STOPPED
 )
 
+// Instance structure of an instance.
 type Instance struct {
 	server  cfg.Server
 	status  Status
@@ -35,7 +37,9 @@ func NewRsyncInstance(server cfg.Server) *Instance {
 	}
 }
 
+// Run start the rsync process, zipping and zip rotation
 func (rs *Instance) Run() {
+	// WARN needs rsync, sshpass and tar previously installed.
 	sshPass := fmt.Sprintf("sshpass -p %s ssh -l %s", rs.server.SSHPass, rs.server.SSHUser)
 	cmd := exec.Command("rsync",
 		"-avh",
@@ -43,7 +47,6 @@ func (rs *Instance) Run() {
 		rs.server.SSHRemotePath,
 		rs.server.LocalPath,
 	)
-	log.Println(cmd)
 	stdoutIn, _ := cmd.StdoutPipe()
 	err := cmd.Start()
 	if err != nil {
@@ -51,12 +54,15 @@ func (rs *Instance) Run() {
 		return
 	}
 	rs.process = cmd.Process
-	rs.capture(stdoutIn)
-	_ = cmd.Wait()
+	rs.capture(stdoutIn)  // Capture the stdout of the process and log it real time.
+	_ = cmd.Wait()  // Wait for the process to finish.
 
 	rs.zipAndRotate()
 }
 
+// zipAndRotate will zip the current backup and delete the oldest one based on how many there are as specified in
+// the config file. The zip rotation is based on the file name, if you rename the zip file, it will be ignored by
+// the rotation.
 func (rs *Instance) zipAndRotate() {
 	path := strings.Split(strings.TrimSuffix(rs.server.LocalPath, "/"), "/")
 	zipDir := strings.Join(path[:len(path) - 1], "/")
@@ -81,10 +87,12 @@ func (rs *Instance) zipAndRotate() {
 	_, _ = exec.Command("tar", "-zcf", target, "-C", rs.server.LocalPath, ".").Output()
 }
 
+// Stop kill the process.
 func (rs *Instance) Stop() {
 	_ = rs.process.Kill()
 }
 
+// capture gets the stdout of the process and detects when it has finished.
 func (rs *Instance) capture(r io.Reader) {
 	buf := make([]byte, 1024)
 	var out string

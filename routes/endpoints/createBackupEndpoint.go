@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+// CreateBackup /create/{name} endpoint, will check if a server exists in the config by name, and start the threaded
+// rsync process.
 func CreateBackup(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	name := vars["name"]

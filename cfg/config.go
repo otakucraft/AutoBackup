@@ -17,6 +17,7 @@ type Server struct {
 	NBackups      int    `json:"n_backups"`  // Number of maximum backups that can be stored.
 }
 
+// ReadConfig Reads and parses the config json file into an array of Server.
 func ReadConfig(path string) error {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -34,6 +35,7 @@ func ReadConfig(path string) error {
 	return nil
 }
 
+// GetServer iterates the Server array to get the credentials of the server based on endpoint name.
 func GetServer(name string) (Server, error) {
 	for _, server := range Servers {
 		if server.Name == name {
@@ -43,6 +45,7 @@ func GetServer(name string) (Server, error) {
 	return Server{}, errors.New("server not found")
 }
 
+// CreateSample if the config json file does not exist, it will create a default one.
 func CreateSample(path string) {
 	Servers = []Server{
 		{
